@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-NetWarden — УЛЬТРА-ПРОСТАЯ ВЕРСИЯ (автозапуск, без кнопок)
-Запускается и сразу работает!
-"""
+
 import sys
 import socket
 import threading
@@ -22,7 +17,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import qdarkstyle
 
 
-# Глобальные переменные
 stats = {}
 history = {}
 lock = threading.Lock()
@@ -30,7 +24,7 @@ lock = threading.Lock()
 
 class Signals(QObject):
     update = pyqtSignal()
-    log = pyqtSignal(str, str)  # текст, цвет
+    log = pyqtSignal(str, str) 
 
 
 signals = Signals()
@@ -42,12 +36,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("NetWarden — Автозапуск (всё работает сразу)")
         self.resize(1200, 700)
 
-        # UI
+
         central = QWidget()
         self.setCentralWidget(central)
         layout = QHBoxLayout(central)
 
-        # Лево — лог
+
         left = QGroupBox("Статус и лог")
         left.setMaximumWidth(380)
         vbox = QVBoxLayout(left)
@@ -61,7 +55,6 @@ class MainWindow(QMainWindow):
         self.log.setReadOnly(True)
         vbox.addWidget(self.log)
 
-        # Право — таблица + график
         right = QVBoxLayout()
 
         self.table = QTableWidget(0, 5)
@@ -78,11 +71,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(left)
         layout.addLayout(right)
 
-        # Сигналы
+
         signals.log.connect(self.add_log)
         signals.update.connect(self.refresh_ui)
 
-        # Автозапуск через 1 сек
+
         QTimer.singleShot(1000, self.auto_start)
 
     def add_log(self, text, color="white"):
@@ -219,7 +212,7 @@ def start_collector():
                     p = prev.get(iface)
                     if not p: continue
                     total = (c.bytes_sent - p.bytes_sent + c.bytes_recv - p.bytes_recv) / dt
-                    if total < 1000: continue  # игнорируем мёртвые интерфейсы
+                    if total < 1000: continue 
                     lines.append(json.dumps({
                         "host": hostname,
                         "iface": iface,
@@ -265,7 +258,6 @@ class RollingStats:
         return max(var, 0) ** 0.5
 
 
-# Запуск
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt6())
@@ -273,9 +265,9 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
 
-    # Обновление UI каждую секунду
     timer = QTimer()
     timer.timeout.connect(lambda: signals.update.emit())
     timer.start(1000)
+
 
     sys.exit(app.exec())
